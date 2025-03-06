@@ -72,7 +72,10 @@ func (s *server) join(c *client, args []string) {
 }
 
 func (s *server) listRooms(c *client, args []string) {
-
+	c.msg("List of available rooms:")
+	for roomName := range s.rooms {
+		c.msg(fmt.Sprintf("%s\n", roomName))
+	}
 }
 
 func (s *server) enterMsg(c *client, args []string) {
