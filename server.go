@@ -1,9 +1,11 @@
 package tcpchat
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
+	"strings"
 )
 
 type server struct {
@@ -79,11 +81,19 @@ func (s *server) listRooms(c *client, args []string) {
 }
 
 func (s *server) enterMsg(c *client, args []string) {
+	if c.room == nil {
+		c.err(errors.New("you must join a room first"))
+		return
+	}
 
+	c.room.broadcast(c, c.nick+": "+strings.Join(args[1:len(args)], " "))
 }
 
 func (s *server) quit(c *client, args []string) {
-
+	log.Printf("client has disconnected: %s", c.conn.RemoteAddr().String())
+	s.quitCurrentRoom(c)
+	c.msg("sad to see you go :(")
+	c.conn.Close()
 }
 
 func (s *server) quitCurrentRoom(c *client) {
